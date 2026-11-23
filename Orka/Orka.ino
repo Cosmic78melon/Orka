@@ -9,6 +9,7 @@ String wifiPassword;
 
 // Variables and Characters
 int i = 0;
+int delayedTime = 167;
 bool isInName = true;
 int differentLetterSystem = 0;
 char upperCaseLetters[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '\0'};
@@ -67,12 +68,12 @@ void loop() {
   if (isLeft && i > 0)
   {
     i--;
-    delay(167);
+    delay(delayedTime);
   }
   if (isRight && i < 25)
   {
     i++;
-    delay(167);
+    delay(delayedTime);
   }
 
   if (isSysChgBtnPrsd)
@@ -82,7 +83,7 @@ void loop() {
       if (differentLetterSystem > 3)
           differentLetterSystem = 0;
 
-      delay(167);
+      delay(delayedTime);
   }
 
   differentLetterSystemChanger();
@@ -97,19 +98,21 @@ void loop() {
     {
       differentLetterSystemChanger2(wifiPassword);
     }
-    delay(167);
+    delay(delayedTime);
   }
   
   if (clearBtn && !submitBtn)
   {
     wifiName.remove(wifiName.length()- 1);
     wifi_Interface(upperCaseLetters[i]);
-    delay(167);
+    delay(delayedTime);
   }
 
   if (submitBtn && clearBtn)
   {
+    isInName = false;
     wifi_Interface(i, "Wi-Fi Password");
+    delay(delayedTime + 50);
   }
 }
 
@@ -117,10 +120,20 @@ void differentLetterSystemChanger()
 {
     display.clearDisplay();
     display.setCursor(3, 10);
-    if (differentLetterSystem == 0) wifi_Interface(upperCaseLetters[i]);
-    else if (differentLetterSystem == 1) wifi_Interface(lowerCaseLetters[i]);
-    else if (differentLetterSystem == 2) wifi_Interface(digits[i]);
-    else wifi_Interface(punctuations[i]);
+    if (isInName)
+    {
+      if (differentLetterSystem == 0) wifi_Interface(upperCaseLetters[i]);
+      else if (differentLetterSystem == 1) wifi_Interface(lowerCaseLetters[i]);
+      else if (differentLetterSystem == 2) wifi_Interface(digits[i]);
+      else wifi_Interface(punctuations[i]);
+    }
+    else
+    {
+      if (differentLetterSystem == 0) wifi_Interface(upperCaseLetters[i], "Wi-Fi Password");
+      else if (differentLetterSystem == 1) wifi_Interface(lowerCaseLetters[i], "Wi-Fi Password");
+      else if (differentLetterSystem == 2) wifi_Interface(digits[i], "Wi-Fi Password");
+      else wifi_Interface(punctuations[i], "Wi-Fi Password");
+    }
     display.display();
 }
 
@@ -129,34 +142,34 @@ void differentLetterSystemChanger2(String &obj)
   if (differentLetterSystem == 0)
   {
     obj += upperCaseLetters[i];
-    delay(167);
+    delay(delayedTime);
     wifi_Interface(upperCaseLetters[i]);
   } 
   else if (differentLetterSystem == 1) {
     obj += lowerCaseLetters[i];
-    delay(167);
+    delay(delayedTime);
     wifi_Interface(lowerCaseLetters[i]);
   }
   else if (differentLetterSystem == 2) {
     obj += digits[i];
-    delay(167);
+    delay(delayedTime);
     wifi_Interface(digits[i]);
   }
   else {
     obj += punctuations[i];
-    delay(167);
+    delay(delayedTime);
     wifi_Interface(punctuations[i]);
   }
 }
 
 void botton_SelectorBar(char i) {
   display.drawFastHLine(0, 44, SCREEN_WIDTH, SSD1306_WHITE);
-  display.setTextSize(1);
+  display.setTextSize(2);
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(16, 51);
-  display.print(F("<    "));
+  display.print(F("<  "));
   display.print(i);
-  display.print(F("    >"));
+  display.print(F("  >"));
 }
 
 void wifi_Interface(char i, String title) {
@@ -170,7 +183,7 @@ void wifi_Interface(char i, String title) {
   display.drawFastHLine(0, 10, SCREEN_WIDTH, SSD1306_WHITE);
 
   // SSID display area
-  display.setTextSize(2);
+  display.setTextSize(1);
   display.setCursor(0, 16);
   if (title == "Wi-Fi Name")
   {
