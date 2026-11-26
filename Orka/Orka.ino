@@ -24,7 +24,11 @@ char digits[] =           {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 Preferences prfc;
 
 // URL Of the api
-String url = "https://api.open-meteo.com/v1/forecast?timezone=auto&latitude=23.7104&longitude=90.399452&current=temperature_2m,wind_speed_10m";
+String url = "https://api.open-meteo.com/v1/forecast?timezone=auto&latitude=23.6445&longitude=90.5984&current=temperature_2m,wind_speed_10m";
+
+// Icons
+const unsigned char night_icon_8x8 [] PROGMEM = {0x1c, 0x30, 0x62,0x60, 0x64,  0x38, 0x1e,0x00};
+
 
 // GPIO Pins
 #define gpio16 16
@@ -246,10 +250,6 @@ void writeInMemory() {
 void draw_weatherUI() {
   display.clearDisplay();
   display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0, 10);
-  display.println(F("Connecting to WiFi..."));
-  display.display();
 
   if (WiFi.status() != WL_CONNECTED) {
     WiFi.mode(WIFI_STA);
@@ -263,7 +263,11 @@ void draw_weatherUI() {
   }
 
   display.clearDisplay();
-  display.setCursor(0, 10);
+  display.setCursor(0, 1);
+  display.print("Weather Info");
+  display.drawBitmap(SCREEN_WIDTH - 10, 0, night_icon_8x8, 8, 8, SSD1306_WHITE);
+  display.drawFastHLine(0, 11, SCREEN_WIDTH, SSD1306_WHITE);
+  display.setCursor(5, 18);
 
   if (WiFi.status() == WL_CONNECTED) {
     WiFiClientSecure client;
@@ -284,12 +288,12 @@ void draw_weatherUI() {
 
         display.print(F("Temp: "));
         display.print(temp);
-        display.println(F(" C"));
+        display.print(F(" C"));
 
-        display.setCursor(0, 24);
+        display.setCursor(5, 30);
         display.print(F("Wind: "));
         display.print(windspeed);
-        display.println(F(" km/h"));
+        display.print(F(" km/h"));
       } else {
         display.println(F("JSON Parse failed"));
       }
@@ -301,7 +305,8 @@ void draw_weatherUI() {
   } else {
     display.println(F("WiFi failed"));
   }
+  display.drawFastHLine(0, 52, SCREEN_WIDTH, SSD1306_WHITE);
 
   display.display();
-  delay(10000);
+  delay(60000);
 }
